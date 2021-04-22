@@ -13,6 +13,5 @@ def createModel():
     model.add(layers.Dense(4,activation='softmax'))
 
     model.summary()
-    
     return model
     

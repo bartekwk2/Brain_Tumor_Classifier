@@ -7,6 +7,54 @@ import random
 import numpy as np
 from tumor import Tumor
 
+from keras.preprocessing.image import ImageDataGenerator
+from skimage import io
+from PIL import Image
+import shutil
+
+
+def augmentAllImages(foldername,datasetIn,datasetOut):
+
+    counter = 0
+    for root, _, _ in os.walk(foldername):  
+        if counter> 0 :
+            pathName = os.path.basename(root)
+            augmentImagesInFolder(datasetIn+pathName+"/",datasetOut+pathName+"/",4)
+        counter+=1
+
+
+def augmentImagesInFolder(image_directory, save_dir, nr_of_copies):
+
+    datagen = ImageDataGenerator(
+        rotation_range=30,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        horizontal_flip=True,
+        vertical_flip=True,
+        fill_mode='constant')
+
+    dataset =[]
+    shutil.rmtree(save_dir)
+
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    
+    my_images = os.listdir(image_directory)
+    for i, image_name in enumerate(my_images):
+        if (image_name.split('.')[1]== 'jpg'):
+            image = io.imread(image_directory + image_name)
+            image = Image.fromarray(image)
+            image = image.resize((224,224))
+            dataset.append(np.array(image))
+
+    x = np.array(dataset)
+
+    i = 0
+    for _ in datagen.flow(x, batch_size=len(x), save_to_dir=save_dir, save_prefix='aug', save_format='jpg'):
+        i += 1
+        if i > nr_of_copies-1:
+            break
+
 def divideImages(percent,typeOfCancer):
     test = []
     rangeType = int(len(typeOfCancer)*percent)
@@ -65,7 +113,7 @@ def crop_image(img):
 
 
 def loadImages(foldername):
-
+    
     image_dict={}
     
     for root, _, files in os.walk(foldername):  

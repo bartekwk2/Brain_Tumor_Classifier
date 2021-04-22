@@ -8,22 +8,32 @@ from sklearn.metrics import confusion_matrix
 from sklearn import metrics
 import pandas as pd
 import random
+import os
 from tumor import Tumor
 from sklearn.metrics import classification_report
-from image_preprocessing import loadImages,crop_image,fileToClass,divideImages
+from image_preprocessing import loadImages,crop_image,fileToClass,divideImages,augmentAllImages
+from test_time_augmentation import predictClasses,hardVoting,softVoting
 
 
+'''
+directory = os.getcwd()
+datasetDirIn = directory + "/Images/"
+datasetDirOut = directory + "/ImagesOut/"
+augmentAllImages("Images",datasetDirIn,datasetDirOut)
+print('end')
+'''
 
-Images = loadImages("Images")
+Images = loadImages("ImagesOut")
 glioma = fileToClass(Images["glioma"],0)
 meningioma =fileToClass(Images["meningioma"],1)
-no = fileToClass(Images["no"],2)
-pituitary = fileToClass(Images["pituitary"],3)
+pituitary = fileToClass(Images["pituitary"],2)
+no = fileToClass(Images["no"],3)
 
-GliomaTumorImages,testGliomaTumorImages = divideImages(0.2,glioma)
-MeningiomaTumorImages,testMeningiomaTumorImages = divideImages(0.2,meningioma)
-NoTumorImages,testNoTumorImages = divideImages(0.2,no)
-PituitaryTumorImages,testPituitaryTumorImages = divideImages(0.2,pituitary)
+GliomaTumorImages,testGliomaTumorImages = divideImages(0.05,glioma)
+MeningiomaTumorImages,testMeningiomaTumorImages = divideImages(0.05,meningioma)
+NoTumorImages,testNoTumorImages = divideImages(0.05,no)
+PituitaryTumorImages,testPituitaryTumorImages = divideImages(0.05,pituitary)
+
 
 AllImagesTEST = []
 AllImagesTEST.extend(testGliomaTumorImages)
@@ -116,6 +126,17 @@ plot_confusion_matrix(confusion_matrix, Tumors)
 
 model.save('tumorClassifier.h5')
 
+glioma_acc_pcc,glioma_acc_ind = softVoting(images=testGliomaTumorImages,knownClass=0)
+meningioma_acc_pcc,meningioma_acc_ind = softVoting(images=testMeningiomaTumorImages,knownClass=1)
+pituitary_acc_pcc,pituitary_acc_ind = softVoting(images=testPituitaryTumorImages,knownClass=2)
+no_acc_pcc,no_acc_ind = softVoting(images=testNoTumorImages,knownClass=3)
+print(glioma_acc_pcc, meningioma_acc_pcc, pituitary_acc_pcc,no_acc_pcc)
+print(glioma_acc_ind, meningioma_acc_ind, pituitary_acc_ind,no_acc_ind)
 
 
+glioma_acc_hard = hardVoting(images=testGliomaTumorImages,knownClass=0)
+meningioma_acc_hard = hardVoting(images=testMeningiomaTumorImages,knownClass=1)
+pituitary_acc_hard = hardVoting(images=testPituitaryTumorImages,knownClass=2)
+no_acc_hard= hardVoting(images=testNoTumorImages,knownClass=3)
+print(glioma_acc_hard, meningioma_acc_hard, pituitary_acc_hard,no_acc_hard)
 

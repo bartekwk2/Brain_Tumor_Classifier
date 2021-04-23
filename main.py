@@ -57,7 +57,6 @@ AllImagesTest = []
 label_test = []
 label = []
 
-
 for cancer in(AllImagesTRAIN):
     AllImages.append(cancer.tumor)
     label.append(cancer.tumorType)
@@ -92,7 +91,6 @@ history = model.fit(train, label,
                     validation_split=0.03,
                     shuffle=True,
                     batch_size=32, epochs=10)
-
 
 
 plt.plot(history.history['accuracy'])

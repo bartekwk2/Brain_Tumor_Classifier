@@ -51,8 +51,9 @@ def hardVoting(images,knownClass):
         fliped1 = flip_lr(img,0)
         fliped2= flip_lr(img,1)
         rotate1 = rotate(img,30)
-        shifted1 = shift(img,-5, axis=1)
-        shifted2 = shift(img,6, axis=0)
+        rotate2 = rotate(img,10)
+        shifted1 = shift(img,-3, axis=0)
+        shifted2 = shift(img,5, axis=0)
 
         classes = []
 
@@ -60,6 +61,7 @@ def hardVoting(images,knownClass):
         _,cF1 = predictClasses(fliped1)
         _,cF2 = predictClasses(fliped2)
         _,cR = predictClasses(rotate1)
+        _,cR2 = predictClasses(rotate2)
         _,cS1 = predictClasses(shifted1)
         _,cS2 = predictClasses(shifted2)
 
@@ -67,6 +69,7 @@ def hardVoting(images,knownClass):
         classes.append(cF1)
         classes.append(cF2)
         classes.append(cR)
+        classes.append(cR2)
         classes.append(cS1)
         classes.append(cS2)
 
@@ -88,17 +91,19 @@ def softVoting(images,knownClass):
         fliped1 = flip_lr(img,0)
         fliped2= flip_lr(img,1)
         rotate1 = rotate(img,30)
-        shifted1 = shift(img,-5, axis=1)
-        shifted2 = shift(img,6, axis=0)
+        rotate2 = rotate(img,10)
+        shifted1 = shift(img,-3, axis=0)
+        shifted2 = shift(img,5, axis=0)
 
         p,_ = predictClasses(img)
         pF1,_ = predictClasses(fliped1)
         pF2,_ = predictClasses(fliped2)
         pR,_ = predictClasses(rotate1)
+        pR2,_ = predictClasses(rotate2)
         pS1,_ = predictClasses(shifted1)
         pS2,_ = predictClasses(shifted2)
 
-        predictions = [p,pF1,pF2,pR,pS1,pS2]
+        predictions = [p,pF1,pF2,pR,pR2,pS1,pS2]
         predictions = np.array(predictions)
 
         c1 = np.array(predictions[:,0])

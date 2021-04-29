@@ -13,16 +13,11 @@ import os
 from tumor import Tumor
 from image_preprocessing import loadImages,crop_image
 
-def predictClasses(inputImage):
+def predictClasses(inputImage, model):
     tumors = [0,1,2,3]
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-    images = []
-    images.append(inputImage)
-    images= array(images).reshape(array(images).shape[0],224,224,1)
-    images = np.array(images).astype('float32')
-    img = images[0]
+    inputImage = inputImage.reshape(224,224,1)
+    img = np.array(inputImage).astype('float32')
     image = np.expand_dims(img, axis=0)
-    model = models.load_model('tumorClassifier.h5')
     prediction = model.predict(image)
     gliomaResult = round(prediction[0][0],3)
     meningiomaResult = round(prediction[0][1],3)
@@ -42,7 +37,7 @@ def rotate(images, angle):
     return sp.ndimage.rotate(
         images, angle,reshape=False)
 
-def hardVoting(images,knownClass):
+def hardVoting(images,knownClass,model):
     tumorHits=0
     for img in images:
         if type(img) is Tumor:
@@ -57,13 +52,13 @@ def hardVoting(images,knownClass):
 
         classes = []
 
-        _,c = predictClasses(img)
-        _,cF1 = predictClasses(fliped1)
-        _,cF2 = predictClasses(fliped2)
-        _,cR = predictClasses(rotate1)
-        _,cR2 = predictClasses(rotate2)
-        _,cS1 = predictClasses(shifted1)
-        _,cS2 = predictClasses(shifted2)
+        _,c = predictClasses(img,model)
+        _,cF1 = predictClasses(fliped1,model)
+        _,cF2 = predictClasses(fliped2,model)
+        _,cR = predictClasses(rotate1,model)
+        _,cR2 = predictClasses(rotate2,model)
+        _,cS1 = predictClasses(shifted1,model)
+        _,cS2 = predictClasses(shifted2,model)
 
         classes.append(c)
         classes.append(cF1)
@@ -81,7 +76,7 @@ def hardVoting(images,knownClass):
     return acc
 
 
-def softVoting(images,knownClass):
+def softVoting(images,knownClass,model):
     imageHitForInd = 0
     percentegSum = 0
     for img in images:
@@ -95,13 +90,13 @@ def softVoting(images,knownClass):
         shifted1 = shift(img,-3, axis=0)
         shifted2 = shift(img,5, axis=0)
 
-        p,_ = predictClasses(img)
-        pF1,_ = predictClasses(fliped1)
-        pF2,_ = predictClasses(fliped2)
-        pR,_ = predictClasses(rotate1)
-        pR2,_ = predictClasses(rotate2)
-        pS1,_ = predictClasses(shifted1)
-        pS2,_ = predictClasses(shifted2)
+        p,_ = predictClasses(img,model)
+        pF1,_ = predictClasses(fliped1,model)
+        pF2,_ = predictClasses(fliped2,model)
+        pR,_ = predictClasses(rotate1,model)
+        pR2,_ = predictClasses(rotate2,model)
+        pS1,_ = predictClasses(shifted1,model)
+        pS2,_ = predictClasses(shifted2,model)
 
         predictions = [p,pF1,pF2,pR,pR2,pS1,pS2]
         predictions = np.array(predictions)

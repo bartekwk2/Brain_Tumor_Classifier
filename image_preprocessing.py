@@ -6,7 +6,6 @@ from skimage.color import rgb2gray
 import random
 import numpy as np
 from tumor import Tumor
-
 from keras.preprocessing.image import ImageDataGenerator
 from skimage import io
 from PIL import Image
@@ -67,12 +66,39 @@ def divideImages(percent,typeOfCancer):
 
     return typeOfCancer,test
 
+def getRandomLists(data,numberOfImages):
+    testing = []
+    training = []
+    #rangeType = int(len(data)*percent)
+
+
+
+    for i in range(numberOfImages):
+        move = random.randrange(numberOfImages-i)
+        element = data[move]
+        data = np.delete(data,move,0)
+        testing.append(element)
+
+    training = data
+
+    return testing,training
+
 
 def fileToClass(files,typeOfCancer):
     cancerClass = []
     for cancer in files:
         cancerClass.append(Tumor(cancer,typeOfCancer))
     return cancerClass
+
+def getTumorsList(glioma,meningioma,pituary,no):
+    tumors = []
+
+    tumors.extend(glioma)
+    tumors.extend(meningioma)
+    tumors.extend(pituary)
+    tumors.extend(no)
+
+    return tumors
 
 def crop_image(img):
     

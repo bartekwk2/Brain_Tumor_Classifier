@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix
 from sklearn import metrics
 import pandas as pd
+from keras import models as models
 import random
 import os
 from tumor import Tumor
@@ -123,18 +124,19 @@ confusion_matrix= confusion_matrix(categorical_test_labels, categorical_preds)
 plot_confusion_matrix(confusion_matrix, Tumors)
 
 model.save('tumorClassifier.h5')
+mod = models.load_model('tumorClassifier.h5')
 
-glioma_acc_pcc,glioma_acc_ind = softVoting(images=testGliomaTumorImages,knownClass=0)
-meningioma_acc_pcc,meningioma_acc_ind = softVoting(images=testMeningiomaTumorImages,knownClass=1)
-pituitary_acc_pcc,pituitary_acc_ind = softVoting(images=testPituitaryTumorImages,knownClass=2)
-no_acc_pcc,no_acc_ind = softVoting(images=testNoTumorImages,knownClass=3)
+glioma_acc_pcc,glioma_acc_ind = softVoting(images=testGliomaTumorImages,knownClass=0,model=mod)
+meningioma_acc_pcc,meningioma_acc_ind = softVoting(images=testMeningiomaTumorImages,knownClass=1,model=mod)
+pituitary_acc_pcc,pituitary_acc_ind = softVoting(images=testPituitaryTumorImages,knownClass=2,model=mod)
+no_acc_pcc,no_acc_ind = softVoting(images=testNoTumorImages,knownClass=3,model=mod)
 print(glioma_acc_pcc, meningioma_acc_pcc, pituitary_acc_pcc,no_acc_pcc)
 print(glioma_acc_ind, meningioma_acc_ind, pituitary_acc_ind,no_acc_ind)
 
 
-glioma_acc_hard = hardVoting(images=testGliomaTumorImages,knownClass=0)
-meningioma_acc_hard = hardVoting(images=testMeningiomaTumorImages,knownClass=1)
-pituitary_acc_hard = hardVoting(images=testPituitaryTumorImages,knownClass=2)
-no_acc_hard= hardVoting(images=testNoTumorImages,knownClass=3)
+glioma_acc_hard = hardVoting(images=testGliomaTumorImages,knownClass=0,model=mod)
+meningioma_acc_hard = hardVoting(images=testMeningiomaTumorImages,knownClass=1,model=mod)
+pituitary_acc_hard = hardVoting(images=testPituitaryTumorImages,knownClass=2,model=mod)
+no_acc_hard= hardVoting(images=testNoTumorImages,knownClass=3,model=mod)
 print(glioma_acc_hard, meningioma_acc_hard, pituitary_acc_hard,no_acc_hard)
 
